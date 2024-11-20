@@ -32,7 +32,8 @@ gelişmelerine fayda sağlayabilirsiniz.
 git clone https://github.com/RamenChan/ViteJS-Stock-Managment.git
 cd ViteJS-Stock-Managment
 npm install 
-npm run dev
+npm run dev 
+```
 
 ## Kullanılan Teknolojiler
 - **ViteJS**: Hızlı geliştirme ortamı.
