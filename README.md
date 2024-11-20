@@ -41,6 +41,22 @@ npm run dev
 - **Material-UI**: Modern ve özelleştirilebilir bileşenler.
 - **TailwindCSS**: CSS ile hızlı ve kolay tasarım.
 
+## Api Bağlantısı Sonrası Dosya yapısı - 20.11.2024 Güncellemesi
+-src/
+├── api/
+│   └── axios.js          # API bağlantısı için Axios yapılandırması
+├── components/
+│   ├── Dashboard.jsx     # Dashboard bileşeni
+│   ├── ProductList.jsx   # Ürün Listeleme bileşeni
+│   └── AddProduct.jsx    # Ürün Ekleme bileşeni
+├── styles/
+│   └── global.css        # Genel CSS dosyası (Tailwind veya özel stiller)
+├── App.jsx               # Uygulama ana dosyası
+├── index.css             # CSS dosyası (Tailwind burada kullanılabilir)
+└── main.jsx              # Giriş noktası
+
+
+
 
 
 

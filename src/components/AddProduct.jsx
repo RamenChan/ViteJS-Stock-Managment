@@ -9,18 +9,33 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
+import api from "../api/axios"; // Axios API bağlantısını ekleyin
 
 const AddProduct = () => {
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // Hata mesajı için state
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ productName, category, stock });
-    setProductName("");
-    setCategory("");
-    setStock("");
+    const productData = {
+      name: productName,
+      category: category,
+      stock: parseInt(stock, 10), // Stok miktarını sayıya çevir
+    };
+
+    try {
+      await api.post("/Products", productData); // API'ye POST isteği gönder
+      setProductName("");
+      setCategory("");
+      setStock("");
+      setErrorMessage(""); // Başarılı olursa hata mesajını temizle
+      alert("Ürün başarıyla eklendi!"); // Kullanıcıya geri bildirim
+    } catch (error) {
+      console.error("Ürün eklenirken hata oluştu:", error);
+      setErrorMessage("Ürün eklenirken bir hata oluştu. Lütfen tekrar deneyin."); // Hata mesajı
+    }
   };
 
   return (
@@ -38,7 +53,6 @@ const AddProduct = () => {
         Ürün Ekle
       </Typography>
       <form onSubmit={handleSubmit}>
-        
         <TextField
           label="Ürün Adı"
           variant="outlined"
@@ -47,7 +61,7 @@ const AddProduct = () => {
           value={productName}
           onChange={(e) => setProductName(e.target.value)}
         />
-        
+
         <FormControl fullWidth margin="normal">
           <InputLabel id="category-label">Kategori</InputLabel>
           <Select
@@ -76,7 +90,17 @@ const AddProduct = () => {
           value={stock}
           onChange={(e) => setStock(e.target.value)}
         />
- 
+
+        {/* Hata Mesajı */}
+        {errorMessage && (
+          <Typography
+            color="error"
+            sx={{ textAlign: "center", marginTop: "8px" }}
+          >
+            {errorMessage}
+          </Typography>
+        )}
+
         <Button
           type="submit"
           variant="contained"

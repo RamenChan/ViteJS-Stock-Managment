@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -14,27 +14,26 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
+import api from "../api/axios"; // Axios API bağlantısını buradan alın
 
 const ProductList = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: "Telefon", category: "Elektronik", stock: 100 },
-    { id: 2, name: "Bilgisayar", category: "Elektronik", stock: 100 },
-    { id: 3, name: "Tablet", category: "Elektronik", stock: 50 },
-    { id: 4, name: "Klavye + Mouse Seti", category: "Elektronik", stock: 50 },
-    { id: 5, name: "Soğutucu", category: "Elektronik", stock: 100 },
-    { id: 6, name: "OEM Parça", category: "Elektronik", stock: 100 },
-    { id: 7, name: "Koltuk Takımı", category: "Mobilya", stock: 300 },
-    { id: 8, name: "Pantolon + T-shirt", category: "Giyim", stock: 500 },
-    { id: 9, name: "Kesme Tahtası", category: "Mutfak", stock: 200 },
-    { id: 10, name: "Futbol Topu", category: "Spor", stock: 150 },
-    { id: 11, name: "Kedi Maması", category: "Market", stock: 350 },
-    { id: 12, name: "insan 2.0", category: "Kitap", stock: 250 },
-    { id: 13, name: "Beyblade", category: "Oyuncak", stock: 180 },
-
-  ]);
-
+  const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+
+  // Verileri API'den çek
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/Products"); // API endpoint
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Veriler çekilirken hata oluştu:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleEditClick = (product) => {
     setCurrentProduct(product);
@@ -46,13 +45,25 @@ const ProductList = () => {
     setCurrentProduct(null);
   };
 
-  const handleSave = () => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === currentProduct.id ? currentProduct : p
-      )
-    );
-    handleClose();
+  const handleSave = async () => {
+    try {
+      await api.put(`/Products/${currentProduct.id}`, currentProduct); // Veritabanında güncelle
+      setProducts((prev) =>
+        prev.map((p) => (p.id === currentProduct.id ? currentProduct : p))
+      );
+      handleClose();
+    } catch (error) {
+      console.error("Ürün güncellenirken hata oluştu:", error);
+    }
+  };
+
+  const handleDeleteClick = async (id) => {
+    try {
+      await api.delete(`/Products/${id}`); // API'den sil
+      setProducts((prev) => prev.filter((product) => product.id !== id));
+    } catch (error) {
+      console.error("Ürün silinirken hata oluştu:", error);
+    }
   };
 
   const handleChange = (e) => {
@@ -89,12 +100,11 @@ const ProductList = () => {
                   >
                     Düzenle
                   </Button>
-                  
+
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => handleDeleteClick()}
-                    sx={{ marginRight: "8px" }}
+                    onClick={() => handleDeleteClick(product.id)}
                   >
                     Sil
                   </Button>

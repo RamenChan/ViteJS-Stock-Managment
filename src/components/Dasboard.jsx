@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import api from "./../api/axios";
 import { Grid, Card, CardContent, Typography } from "@mui/material";
 import DevicesIcon from "@mui/icons-material/Devices";
 import ChairIcon from "@mui/icons-material/Chair";
@@ -10,16 +11,47 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ToysIcon from "@mui/icons-material/Toys";
 
 const Dashboard = () => {
-  const categories = [
-    { name: "Elektronik", icon: <DevicesIcon sx={{scale:'3'}} />, stock: 400, color: "#4caf50" },
-    { name: "Mobilya", icon: <ChairIcon sx={{scale:'3'}}/>, stock: 300, color: "#ff9800" },
-    { name: "Giyim", icon: <CheckroomIcon sx={{scale:'3'}}/>, stock: 500, color: "#2196f3" },
-    { name: "Mutfak", icon: <KitchenIcon sx={{scale:'3'}}/>, stock: 200, color: "#e91e63" },
-    { name: "Spor", icon: <SportsSoccerIcon sx={{scale:'3'}}/>, stock: 150, color: "#9c27b0" },
-    { name: "Market", icon: <LocalGroceryStoreIcon sx={{scale:'3'}}/>, stock: 350, color: "#3f51b5" },
-    { name: "Kitap", icon: <MenuBookIcon sx={{scale:'3'}}/>, stock: 250, color: "#673ab7" },
-    { name: "Oyuncak", icon: <ToysIcon sx={{scale:'3'}}/>, stock: 180, color: "#ff5722" },
-  ];
+  const [categories, setCategories] = useState([]);
+
+  // API'den verileri çekme
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/Products");
+        const products = response.data;
+
+        // Kategorilere göre gruplayıp stokları toplama
+        const groupedCategories = products.reduce((acc, product) => {
+          acc[product.category] = (acc[product.category] || 0) + product.stock;
+          return acc;
+        }, {});
+
+        // Grupları mevcut kategori yapısına dönüştürme
+        const categoryData = [
+          { name: "Elektronik", icon: <DevicesIcon sx={{ fontSize: 60 }}/>, color: "#4caf50"},
+          { name: "Mobilya", icon: <ChairIcon  sx={{ fontSize: 60 }}/>, color: "#ff9800" },
+          { name: "Giyim", icon: <CheckroomIcon  sx={{ fontSize: 60 }}/>, color: "#2196f3" },
+          { name: "Mutfak", icon: <KitchenIcon  sx={{ fontSize: 60 }}/>, color: "#e91e63" },
+          { name: "Spor", icon: <SportsSoccerIcon  sx={{ fontSize: 60 }}/>, color: "#9c27b0" },
+          { name: "Market", icon: <LocalGroceryStoreIcon  sx={{ fontSize: 60 }}/>, color: "#3f51b5" },
+          { name: "Kitap", icon: <MenuBookIcon  sx={{ fontSize: 60 }}/>, color: "#673ab7" },
+          { name: "Oyuncak", icon: <ToysIcon  sx={{ fontSize: 60 }}/>, color: "#ff5722" },
+        ];
+
+        // Stok değerlerini ekleme
+        const updatedCategories = categoryData.map((category) => ({
+          ...category,
+          stock: groupedCategories[category.name] || 0, // Eğer kategori bulunmazsa stok 0
+        }));
+
+        setCategories(updatedCategories);
+      } catch (error) {
+        console.error("API'den veriler alınırken hata oluştu:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div style={{ padding: "16px" }}>
